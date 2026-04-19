@@ -47,4 +47,10 @@ app.*.map.json
 # Generated Files
 *.pdf
 Screenshot 2026-04-19 at 5.05.27 PM.png
+Screenshot 2026-04-19 at 6.41.32 PM.png
+test_logic/
+python_test/
+test_template_2_dynamic.pdf
+test_template_3_static.pdf
+test_template_4_compact.pdf
 

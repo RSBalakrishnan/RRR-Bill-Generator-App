@@ -55,14 +55,14 @@ class PdfServiceV2 {
                           pw.Column(
                             crossAxisAlignment: pw.CrossAxisAlignment.start,
                             children: [
-                              pw.Text("To:", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
-                              pw.Text(billData.billedTo, style: pw.TextStyle(fontSize: 14)),
+                              pw.Text("To:", style: pw.TextStyle(color: PdfColors.grey700, fontWeight: pw.FontWeight.bold, fontSize: 12)),
+                              pw.Text(billData.billedTo, style: pw.TextStyle(color: PdfColors.grey700, fontSize: 14)),
                             ],
                           ),
                           pw.Column(
                             crossAxisAlignment: pw.CrossAxisAlignment.end,
                             children: [
-                              pw.Text("Date: ${billData.formattedDate}", style: pw.TextStyle(fontSize: 14)),
+                              pw.Text("Date: ${billData.formattedDate}", style: pw.TextStyle(color: PdfColors.grey700, fontSize: 14)),
                             ],
                           ),
                         ],
@@ -73,9 +73,9 @@ class PdfServiceV2 {
                       // Title
                       pw.Center(
                         child: pw.Text(
-                          "Only Transporting Bill Charges",
+                          "Base Freight Charge",
                           style: pw.TextStyle(
-                            color: PdfColor.fromHex("#FF0000"), // Red
+                            color: PdfColors.grey700, // Reduced from black
                             fontSize: 16,
                             fontWeight: pw.FontWeight.bold,
                           ),
@@ -101,14 +101,14 @@ class PdfServiceV2 {
                               pw.TextSpan(
                                 text: "RUPEES IN WORDS: ",
                                 style: pw.TextStyle(
-                                  color: PdfColors.black,
+                                  color: PdfColors.grey700,
                                   fontWeight: pw.FontWeight.bold,
                                 ),
                               ),
                               pw.TextSpan(
                                 text: NumberToWords.convert(billData.totalAmount.toInt()),
                                 style: pw.TextStyle(
-                                  color: PdfColor.fromHex("#FF0000"), // Red
+                                  color: PdfColors.black, // Red -> Black
                                   fontWeight: pw.FontWeight.bold,
                                 ),
                               ),
@@ -128,13 +128,13 @@ class PdfServiceV2 {
                             pw.Text(
                               "Rajamani Transport",
                               style: pw.TextStyle(
-                                color: PdfColor.fromHex("#FF0000"), // Red
+                                color: PdfColors.black, // Red -> Black
                                 fontWeight: pw.FontWeight.bold,
                                 fontSize: 14,
                               ),
                             ),
                              pw.SizedBox(height: 40),
-                            pw.Text("Proprietor Sign", style: pw.TextStyle(fontSize: 12)),
+                            pw.Text("Proprietor Sign", style: pw.TextStyle(color: PdfColors.grey700, fontSize: 12, fontWeight: pw.FontWeight.bold)),
                           ],
                         ),
                       ),
@@ -161,7 +161,7 @@ class PdfServiceV2 {
       fontWeight: pw.FontWeight.bold,
       fontSize: 10,
     );
-    final cellTextStyle = pw.TextStyle(fontSize: 10);
+    final cellTextStyle = pw.TextStyle(color: PdfColors.black, fontSize: 10);
 
     return pw.Table(
       border: pw.TableBorder.all(color: tableBorderColor),
@@ -212,8 +212,8 @@ class PdfServiceV2 {
             pw.SizedBox(),
             _pCell("${billData.totalTrips} trips", pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10), align: pw.TextAlign.center),
             pw.SizedBox(),
-            _pCell("TOTAL", pw.TextStyle(color: PdfColors.red, fontWeight: pw.FontWeight.bold, fontSize: 10), align: pw.TextAlign.right),
-            _pCell(billData.totalAmount.toInt().toString(), pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10), align: pw.TextAlign.right),
+            _pCell("TOTAL", pw.TextStyle(color: PdfColors.grey700, fontWeight: pw.FontWeight.bold, fontSize: 10), align: pw.TextAlign.right),
+            _pCell(billData.totalAmount.toInt().toString(), pw.TextStyle(color: PdfColors.grey700, fontWeight: pw.FontWeight.bold, fontSize: 10), align: pw.TextAlign.right),
           ],
         ),
       ],

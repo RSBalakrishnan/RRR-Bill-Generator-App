@@ -18,6 +18,7 @@ class TransportBillTester(FPDF):
         self.set_right_margin(40)
         
         # Billed To
+        self.set_text_color(128, 128, 128)
         self.set_font("helvetica", "B", 10)
         self.cell(0, 15, "To:", ln=True)
         self.set_font("helvetica", "", 12)
@@ -25,16 +26,17 @@ class TransportBillTester(FPDF):
         
         # Date (Right aligned, kept relative to To section)
         self.set_y(246.7)
+        self.set_text_color(128, 128, 128)
         self.set_font("helvetica", "", 12)
         self.cell(0, 15, f"Date: {date}", align='R', ln=True)
+        self.set_text_color(0, 0, 0) # Reset before title
         
         self.ln(20)
         
         # Title (Reduced size)
-        self.set_text_color(255, 0, 0) # Red
+        self.set_text_color(128, 128, 128) # Grey
         self.set_font("helvetica", "B", 12)
-        self.cell(0, 20, "Only Transporting Bill Charges", align='C', ln=True)
-        self.set_text_color(0, 0, 0) # Reset to Black
+        self.cell(0, 20, "Base Freight Charge", align='C', ln=True)
         self.ln(10)
 
     def draw_table(self, items, is_static=False):
@@ -44,12 +46,14 @@ class TransportBillTester(FPDF):
         
         # Header
         self.set_font("helvetica", "B", 10)
+        self.set_text_color(0, 0, 0)
         for i, header in enumerate(headers):
             self.cell(cols[i], 25, header, border=1, align='C')
         self.ln()
         
         # Items
         self.set_font("helvetica", "", 10)
+        self.set_text_color(0, 0, 0)
         total_trips = 0
         total_amount = 0
         
@@ -78,12 +82,13 @@ class TransportBillTester(FPDF):
                 
         # Footer / Totals
         self.set_font("helvetica", "B", 10)
+        self.set_text_color(0, 0, 0)
         self.cell(sum(cols[:4]), 25, "", border=0) # Space
         self.cell(cols[4], 25, f"{total_trips} trips", border=1, align='C')
         self.cell(cols[5], 25, "", border=0) # Space
-        self.set_text_color(255, 0, 0)
+        self.set_text_color(128, 128, 128)
         self.cell(cols[6], 25, "TOTAL", border=1, align='C')
-        self.set_text_color(0, 0, 0)
+        self.set_text_color(128, 128, 128) # Amount also grey
         self.cell(cols[7], 25, str(total_amount), border=1, align='C')
         self.ln(25)
         self.draw_rupees_in_words(total_amount)
@@ -97,19 +102,20 @@ class TransportBillTester(FPDF):
         self.set_y(curr_y + 8)
         self.set_x(50)
         self.set_font("helvetica", "B", 10)
-        self.set_text_color(0, 0, 0)
+        self.set_text_color(128, 128, 128)
         self.cell(120, 15, "RUPEES IN WORDS: ", border=0)
-        self.set_text_color(255, 0, 0)
-        self.cell(0, 15, "SAMPLE RUPEES IN WORDS ONLY", border=0)
         self.set_text_color(0, 0, 0)
+        self.cell(0, 15, "SAMPLE RUPEES IN WORDS ONLY", border=0)
         self.ln(25)
 
     def add_signature(self):
         # Position signature lower (Further from content, closer to bottom)
-        self.set_y(self.h - 95) # Lowered from h - 110
+        self.set_y(self.h - 90) # Adjusted to be slightly lower
         self.set_x(self.w - 200)
         self.set_font("helvetica", "B", 12)
+        self.set_text_color(128, 128, 128)
         self.cell(160, 15, "Proprietor Sign", align='C', ln=True)
+        self.set_text_color(0, 0, 0)
 
 
     def add_compact_layout(self, bill_no, billed_to, date):
@@ -145,10 +151,9 @@ class TransportBillTester(FPDF):
         self.cell(0, 20, f"  {billed_to}", border='B', ln=True)
         
         self.ln(10)
-        self.set_text_color(255, 0, 0) # Red
+        self.set_text_color(128, 128, 128) # Grey
         self.set_font("helvetica", "B", 12)
-        self.cell(0, 20, "Only Transporting Bill Charges", align='C', ln=True)
-        self.set_text_color(0, 0, 0)
+        self.cell(0, 20, "Base Freight Charge", align='C', ln=True)
         self.ln(5)
 
     def draw_compact_table(self, items):
@@ -157,11 +162,13 @@ class TransportBillTester(FPDF):
         headers = ["Date", "Lorry No.", "Material", "Challan", "Trips", "Site", "Rate", "Amount"]
         
         self.set_font("helvetica", "B", 9)
+        self.set_text_color(0, 0, 0)
         for i, h in enumerate(headers):
             self.cell(cols[i], 20, h, border=1, align='C')
         self.ln()
         
         self.set_font("helvetica", "", 9)
+        self.set_text_color(0, 0, 0)
         t_trips, t_amt = 0, 0
         for i in range(18): # Fixed 18 compact rows
             if i < len(items):
@@ -178,12 +185,13 @@ class TransportBillTester(FPDF):
         
         # Summary
         self.set_font("helvetica", "B", 9)
+        self.set_text_color(0, 0, 0)
         self.cell(sum(cols[:4]), 20, "")
         self.cell(cols[4], 20, f"{t_trips} trips", border=1, align='C')
         self.cell(cols[5], 20, "")
-        self.set_text_color(255, 0, 0)
+        self.set_text_color(128, 128, 128)
         self.cell(cols[6], 20, "TOTAL", border=1, align='C')
-        self.set_text_color(0, 0, 0)
+        self.set_text_color(128, 128, 128) # Amount also grey
         self.cell(cols[7], 20, str(t_amt), border=1, align='C')
         self.ln(20)
         self.draw_rupees_in_words(t_amt)
