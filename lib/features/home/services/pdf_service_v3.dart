@@ -132,7 +132,7 @@ class PdfServiceV3 {
                           ],
                         ),
                       ),
-                      pw.SizedBox(height: 70), // Lowered from 85.5
+                      pw.SizedBox(height: 50), // Lowered from 70
                     ],
                   ),
                 ),

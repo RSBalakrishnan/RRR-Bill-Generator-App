@@ -133,12 +133,12 @@ class PdfServiceV2 {
                                 fontSize: 14,
                               ),
                             ),
-                            pw.SizedBox(height: 40),
+                             pw.SizedBox(height: 40),
                             pw.Text("Proprietor Sign", style: pw.TextStyle(fontSize: 12)),
                           ],
                         ),
                       ),
-                      pw.SizedBox(height: 40), // Lowered from 60
+                      pw.SizedBox(height: 20), // Lowered from 40
                     ],
                   ),
                 ),

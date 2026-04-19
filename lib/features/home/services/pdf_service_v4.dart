@@ -128,7 +128,7 @@ class PdfServiceV4 {
                 // Signature area - Forced visibility via Positioned
                 pw.Positioned(
                   right: 40,
-                  bottom: 15, // Further lowered from 25
+                  bottom: 5, // Extremely low position
                   child: pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.center,
                     children: [
