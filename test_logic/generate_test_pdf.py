@@ -88,14 +88,18 @@ class TransportBillTester(FPDF):
         self.ln(35)
         
         # Rupees in Words
-        self.rect(self.get_x(), self.get_y(), self.w - 80, 40)
-        self.set_x(self.get_x() + 10)
-        self.set_y(self.get_y() + 10)
-        self.set_font("helvetica", "B", 12)
-        self.cell(150, 15, "RUPEES IN WORDS: ", border=0)
+        self.ln(10)
+        curr_y = self.get_y()
+        self.rect(40, curr_y, self.w - 80, 25)
+        self.set_y(curr_y + 5)
+        self.set_x(50)
+        self.set_font("helvetica", "B", 10)
+        self.set_text_color(0, 0, 0)
+        self.cell(120, 15, "RUPEES IN WORDS: ", border=0)
         self.set_text_color(255, 0, 0)
         self.cell(0, 15, "SAMPLE RUPEES IN WORDS ONLY", border=0)
         self.set_text_color(0, 0, 0)
+        self.ln(20)
         
     def add_signature(self):
         # Move Y offset 25.5 points (0.9cm) higher
@@ -138,10 +142,6 @@ class TransportBillTester(FPDF):
         self.cell(30, 20, "To,")
         self.set_text_color(0, 0, 0)
         self.cell(0, 20, f"  {billed_to}", border='B', ln=True)
-        
-        # Second underline
-        self.cell(30, 15, "")
-        self.cell(0, 15, "", border='B', ln=True)
         
         self.ln(10)
         self.set_text_color(255, 0, 0) # Red
