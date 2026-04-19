@@ -109,18 +109,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(width: 8),
                     ChoiceChip(
-                      label: const Text("Transport (Dynamic)"),
-                      selected: _currentTemplate == BillTemplate.transport,
-                      onSelected: (val) => setState(() => _currentTemplate = BillTemplate.transport),
-                    ),
-                    const SizedBox(width: 8),
-                    ChoiceChip(
-                      label: const Text("Transport (Static)"),
-                      selected: _currentTemplate == BillTemplate.transportStatic,
-                      onSelected: (val) => setState(() => _currentTemplate = BillTemplate.transportStatic),
-                    ),
-                    const SizedBox(width: 8),
-                    ChoiceChip(
                       label: const Text("Transport (Compact - T4)"),
                       selected: _currentTemplate == BillTemplate.transportCompact,
                       onSelected: (val) => setState(() => _currentTemplate = BillTemplate.transportCompact),
