@@ -12,27 +12,27 @@ class TransportBillTester(FPDF):
         if os.path.exists(self.template_path):
             self.image(self.template_path, x=0, y=0, w=self.w, h=self.h)
         
-        # To Section (Approximate offset 180pt matching Dart code)
-        self.set_y(180)
+        # To Section (Lower region matching refined offset ~260pt)
+        self.set_y(260)
         self.set_left_margin(40)
         self.set_right_margin(40)
         
         # Billed To
-        self.set_font("helvetica", "B", 12)
+        self.set_font("helvetica", "B", 10)
         self.cell(0, 15, "To:", ln=True)
-        self.set_font("helvetica", "", 14)
+        self.set_font("helvetica", "", 12)
         self.cell(0, 15, billed_to, ln=True)
         
-        # Date (Right aligned at the same Y as Billed To)
-        self.set_y(195)
-        self.set_font("helvetica", "", 14)
+        # Date (Right aligned)
+        self.set_y(275)
+        self.set_font("helvetica", "", 12)
         self.cell(0, 15, f"Date: {date}", align='R', ln=True)
         
         self.ln(20)
         
-        # Title
+        # Title (Reduced size)
         self.set_text_color(255, 0, 0) # Red
-        self.set_font("helvetica", "B", 16)
+        self.set_font("helvetica", "B", 12)
         self.cell(0, 20, "Only Transporting Bill Charges", align='C', ln=True)
         self.set_text_color(0, 0, 0) # Reset to Black
         self.ln(10)
@@ -53,7 +53,7 @@ class TransportBillTester(FPDF):
         total_trips = 0
         total_amount = 0
         
-        row_count = 18 if is_static else len(items)
+        row_count = 10 if is_static else len(items)
         
         for i in range(row_count):
             if i < len(items):
@@ -100,14 +100,11 @@ class TransportBillTester(FPDF):
     def add_signature(self):
         self.set_y(self.h - 120)
         self.set_x(self.w - 200)
-        self.set_text_color(255, 0, 0)
-        self.set_font("helvetica", "B", 14)
-        self.cell(160, 20, "Rajamani Transport", align='C', ln=True)
-        self.set_text_color(0, 0, 0)
         self.ln(40)
         self.set_x(self.w - 200)
-        self.set_font("helvetica", "", 12)
-        self.cell(160, 15, "Proprietor", align='C', ln=True)
+        self.set_font("helvetica", "B", 12)
+        self.cell(160, 15, "Proprietor Sign", align='C', ln=True)
+
 
 # Sample Execution
 if __name__ == "__main__":

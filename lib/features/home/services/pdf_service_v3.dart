@@ -8,7 +8,7 @@ import '../models/transport_bill_data.dart';
 import '../utils/number_to_words.dart';
 
 class PdfServiceV3 {
-  static const int _fixedRowCount = 18; // Fixed number of rows to fill the page
+  static const int _fixedRowCount = 10; // Fixed number of rows to fill the page
 
   static Future<void> generateAndPreview(
     material.BuildContext context,
@@ -47,7 +47,7 @@ class PdfServiceV3 {
                   child: pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
-                      pw.SizedBox(height: 180), // Adjust to clear letterhead
+                      pw.SizedBox(height: 260), // Lower region to clear letterhead
                       
                       // Billed To & Date Row
                       pw.Row(
@@ -57,14 +57,14 @@ class PdfServiceV3 {
                           pw.Column(
                             crossAxisAlignment: pw.CrossAxisAlignment.start,
                             children: [
-                              pw.Text("To:", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
-                              pw.Text(billData.billedTo, style: pw.TextStyle(fontSize: 14)),
+                              pw.Text("To:", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
+                              pw.Text(billData.billedTo, style: pw.TextStyle(fontSize: 12)),
                             ],
                           ),
                           pw.Column(
                             crossAxisAlignment: pw.CrossAxisAlignment.end,
                             children: [
-                              pw.Text("Date: ${billData.formattedDate}", style: pw.TextStyle(fontSize: 14)),
+                              pw.Text("Date: ${billData.formattedDate}", style: pw.TextStyle(fontSize: 12)),
                             ],
                           ),
                         ],
@@ -78,7 +78,7 @@ class PdfServiceV3 {
                           "Only Transporting Bill Charges",
                           style: pw.TextStyle(
                             color: PdfColor.fromHex("#FF0000"), // Red
-                            fontSize: 16,
+                            fontSize: 12,
                             fontWeight: pw.FontWeight.bold,
                           ),
                         ),
@@ -127,16 +127,8 @@ class PdfServiceV3 {
                         child: pw.Column(
                           crossAxisAlignment: pw.CrossAxisAlignment.center,
                           children: [
-                            pw.Text(
-                              "Rajamani Transport",
-                              style: pw.TextStyle(
-                                color: PdfColor.fromHex("#FF0000"), // Red
-                                fontWeight: pw.FontWeight.bold,
-                                fontSize: 14,
-                              ),
-                            ),
                             pw.SizedBox(height: 40),
-                            pw.Text("Proprietor", style: pw.TextStyle(fontSize: 12)),
+                            pw.Text("Proprietor Sign", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
                           ],
                         ),
                       ),
