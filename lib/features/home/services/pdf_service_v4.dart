@@ -8,7 +8,7 @@ import '../models/transport_bill_data.dart';
 import '../utils/number_to_words.dart';
 
 class PdfServiceV4 {
-  static const int _fixedRowCount = 18; 
+  static const int _fixedRowCount = 20; 
 
   static Future<void> generateAndPreview(
     material.BuildContext context,
@@ -81,53 +81,49 @@ class PdfServiceV4 {
                       _buildTable(billData, mainFont, boldFont),
 
                       pw.SizedBox(height: 10),
-                    ],
-                  ),
-                ),
 
-                // Rupees in Words - Forced visibility via Positioned
-                pw.Positioned(
-                  left: 40,
-                  right: 40,
-                  bottom: 110,
-                  child: pw.Container(
-                    padding: const pw.EdgeInsets.all(6),
-                    decoration: pw.BoxDecoration(
-                      border: pw.Border.all(color: PdfColors.grey),
-                    ),
-                    child: pw.RichText(
-                      text: pw.TextSpan(
-                        children: [
-                          pw.TextSpan(
-                            text: "RUPEES IN WORDS: ",
-                            style: pw.TextStyle(
-                              font: boldFont,
-                              color: PdfColors.grey700,
-                              fontSize: 10,
-                            ),
+                      // Rupees in Words - Now exactly below the table
+                      pw.Container(
+                        padding: const pw.EdgeInsets.all(6),
+                        decoration: pw.BoxDecoration(
+                          border: pw.Border.all(color: PdfColors.grey),
+                        ),
+                        child: pw.RichText(
+                          text: pw.TextSpan(
+                            children: [
+                              pw.TextSpan(
+                                text: "RUPEES IN WORDS: ",
+                                style: pw.TextStyle(
+                                  font: boldFont,
+                                  color: PdfColors.grey700,
+                                  fontSize: 10,
+                                ),
+                              ),
+                              pw.TextSpan(
+                                text: (NumberToWords.convert(billData.totalAmount.toInt()).toUpperCase()),
+                                style: pw.TextStyle(
+                                  font: boldFont,
+                                  color: PdfColors.black,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ],
                           ),
-                          pw.TextSpan(
-                            text: (NumberToWords.convert(billData.totalAmount.toInt()).toUpperCase()),
-                            style: pw.TextStyle(
-                              font: boldFont,
-                              color: PdfColors.black,
-                              fontSize: 10,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                ),
 
-                // Signature area - Moved up to avoid footer overlap
-                pw.Positioned(
-                  right: 40,
-                  bottom: 50, // Moved up from 5
-                  child: pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.center,
-                    children: [
-                      pw.Text("Proprietor Sign", style: pw.TextStyle(font: boldFont, color: PdfColors.grey700, fontSize: 11)),
+                      pw.SizedBox(height: 40), // Gap for signing
+
+                      // Signature area - Now exactly below the Rupees section
+                      pw.Align(
+                        alignment: pw.Alignment.bottomRight,
+                        child: pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.center,
+                          children: [
+                            pw.Text("Proprietor Sign", style: pw.TextStyle(font: boldFont, color: PdfColors.grey700, fontSize: 11)),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -184,12 +180,12 @@ class PdfServiceV4 {
     return pw.Table(
       border: pw.TableBorder.all(color: tableBorderColor),
       columnWidths: {
-        0: const pw.FixedColumnWidth(50), // Date
+        0: const pw.FixedColumnWidth(70), // Date (Increased)
         1: const pw.FixedColumnWidth(80), // Lorry No
         2: const pw.FixedColumnWidth(60), // Material
         3: const pw.FixedColumnWidth(55), // Challan
         4: const pw.FixedColumnWidth(35), // Trips
-        5: const pw.FixedColumnWidth(120), // Site
+        5: const pw.FixedColumnWidth(100), // Site (Reduced)
         6: const pw.FixedColumnWidth(50), // Rate
         7: const pw.FixedColumnWidth(60), // Amount
       },
@@ -221,7 +217,7 @@ class PdfServiceV4 {
                 _pCell(item.trips.toString(), cellTextStyle, align: pw.TextAlign.center),
                 _pCell(item.site, cellTextStyle, align: pw.TextAlign.center),
                 _pCell(item.rate.toInt().toString(), cellTextStyle, align: pw.TextAlign.center),
-                _pCell(item.amount.toInt().toString(), cellTextStyle, align: pw.TextAlign.center),
+                _pCell((item.trips * item.rate).toInt().toString(), cellTextStyle, align: pw.TextAlign.center),
               ],
             );
           } else {

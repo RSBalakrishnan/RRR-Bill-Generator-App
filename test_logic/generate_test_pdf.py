@@ -157,7 +157,7 @@ class TransportBillTester(FPDF):
 
     def draw_compact_table(self, items):
         # Smaller font and padding for T4
-        cols = [50, 80, 60, 55, 35, 120, 50, 60]
+        cols = [70, 80, 60, 55, 35, 100, 50, 60]
         headers = ["Date", "Lorry No.", "Material", "Challan", "Trips", "Site", "Rate", "Amount"]
         
         self.set_font("helvetica", "B", 9)
@@ -169,7 +169,7 @@ class TransportBillTester(FPDF):
         self.set_font("helvetica", "", 9)
         self.set_text_color(0, 0, 0)
         t_trips, t_amt = 0, 0
-        for i in range(18): # Fixed 18 compact rows
+        for i in range(20): # Fixed 20 compact rows (Increased)
             if i < len(items):
                 it = items[i]
                 t_trips += it['trips']
@@ -192,8 +192,15 @@ class TransportBillTester(FPDF):
         self.cell(cols[6], 20, "TOTAL", border=1, align='C')
         self.set_text_color(0, 0, 0) # Amount now black
         self.cell(cols[7], 20, str(t_amt), border=1, align='C')
-        self.ln(20)
+        self.ln(30) # Space exactly below table for Rupees
+        
         self.draw_rupees_in_words(t_amt)
+        
+        # Signing gap
+        self.ln(40)
+        self.set_text_color(128, 128, 128)
+        self.set_font("helvetica", "B", 11)
+        self.cell(0, 15, "Proprietor Sign", align='R', ln=True)
 
 # Sample Execution
 if __name__ == "__main__":
