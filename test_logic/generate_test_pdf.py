@@ -12,8 +12,8 @@ class TransportBillTester(FPDF):
         if os.path.exists(self.template_path):
             self.image(self.template_path, x=0, y=0, w=self.w, h=self.h)
         
-        # To Section (Lower region matching refined offset ~260pt)
-        self.set_y(260)
+        # To Section (Moved 1cm higher ~28.3pt from previous 260pt)
+        self.set_y(231.7)
         self.set_left_margin(40)
         self.set_right_margin(40)
         
