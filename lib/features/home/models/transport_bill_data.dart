@@ -23,11 +23,13 @@ class TransportServiceItem {
 }
 
 class TransportBillData {
+  String billNo;
   String billedTo;
   DateTime billDate;
   List<TransportServiceItem> items;
 
   TransportBillData({
+    required this.billNo,
     required this.billedTo,
     required this.billDate,
     required this.items,

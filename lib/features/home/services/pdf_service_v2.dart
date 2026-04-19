@@ -134,11 +134,11 @@ class PdfServiceV2 {
                               ),
                             ),
                             pw.SizedBox(height: 40),
-                            pw.Text("Proprietor", style: pw.TextStyle(fontSize: 12)),
+                            pw.Text("Proprietor Sign", style: pw.TextStyle(fontSize: 12)),
                           ],
                         ),
                       ),
-                      pw.SizedBox(height: 60),
+                      pw.SizedBox(height: 40), // Lowered from 60
                     ],
                   ),
                 ),
@@ -167,11 +167,11 @@ class PdfServiceV2 {
       border: pw.TableBorder.all(color: tableBorderColor),
       columnWidths: {
         0: const pw.FixedColumnWidth(55), // Date
-        1: const pw.FixedColumnWidth(70), // Lorry No
-        2: const pw.FixedColumnWidth(65), // Material
+        1: const pw.FixedColumnWidth(85), // Lorry No (Increased)
+        2: const pw.FixedColumnWidth(60), // Material
         3: const pw.FixedColumnWidth(55), // Challan
         4: const pw.FixedColumnWidth(35), // Trips
-        5: const pw.FixedColumnWidth(110), // Site
+        5: const pw.FixedColumnWidth(100), // Site
         6: const pw.FixedColumnWidth(50), // Rate
         7: const pw.FixedColumnWidth(60), // Amount
       },
@@ -193,14 +193,14 @@ class PdfServiceV2 {
         // Rows
         ...billData.items.map((item) => pw.TableRow(
           children: [
-            _pCell(item.date, cellTextStyle),
-            _pCell(item.lorryNo, cellTextStyle),
-            _pCell(item.material, cellTextStyle),
-            _pCell(item.challanNo, cellTextStyle),
+            _pCell(item.date, cellTextStyle, align: pw.TextAlign.center),
+            _pCell(item.lorryNo, cellTextStyle, align: pw.TextAlign.center),
+            _pCell(item.material, cellTextStyle, align: pw.TextAlign.center),
+            _pCell(item.challanNo, cellTextStyle, align: pw.TextAlign.center),
             _pCell(item.trips.toString(), cellTextStyle, align: pw.TextAlign.center),
-            _pCell(item.site, cellTextStyle),
-            _pCell(item.rate.toInt().toString(), cellTextStyle, align: pw.TextAlign.right),
-            _pCell(item.amount.toInt().toString(), cellTextStyle, align: pw.TextAlign.right),
+            _pCell(item.site, cellTextStyle, align: pw.TextAlign.center),
+            _pCell(item.rate.toInt().toString(), cellTextStyle, align: pw.TextAlign.center),
+            _pCell(item.amount.toInt().toString(), cellTextStyle, align: pw.TextAlign.center),
           ],
         )),
         // Footer (Summary)

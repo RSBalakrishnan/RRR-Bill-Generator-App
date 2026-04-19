@@ -5,13 +5,14 @@ import '../models/transport_bill_data.dart';
 import '../services/pdf_service.dart';
 import '../services/pdf_service_v2.dart';
 import '../services/pdf_service_v3.dart';
+import '../services/pdf_service_v4.dart';
 import '../widgets/billed_to_field.dart';
 import '../widgets/date_selector.dart';
 import '../widgets/service_item_card.dart';
 import '../widgets/transport_service_item_card.dart';
 import '../widgets/generate_bill_button.dart';
 
-enum BillTemplate { standard, transport, transportStatic }
+enum BillTemplate { standard, transport, transportStatic, transportCompact }
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,6 +24,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _formKey = GlobalKey<FormState>();
   final _billedToController = TextEditingController();
+  final _billNoController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
   BillTemplate _currentTemplate = BillTemplate.standard;
 
@@ -117,6 +119,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       selected: _currentTemplate == BillTemplate.transportStatic,
                       onSelected: (val) => setState(() => _currentTemplate = BillTemplate.transportStatic),
                     ),
+                    const SizedBox(width: 8),
+                    ChoiceChip(
+                      label: const Text("Transport (Compact - T4)"),
+                      selected: _currentTemplate == BillTemplate.transportCompact,
+                      onSelected: (val) => setState(() => _currentTemplate = BillTemplate.transportCompact),
+                    ),
                   ],
                 ),
               ),
@@ -138,6 +146,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
                   child: Column(
                     children: [
+                      if (_currentTemplate != BillTemplate.standard) ...[
+                        TextFormField(
+                          controller: _billNoController,
+                          decoration: InputDecoration(
+                            labelText: "Bill No.",
+                            labelStyle: GoogleFonts.poppins(fontSize: 14),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
                       BilledToField(
                         controller: _billedToController,
                         validator: (value) => value == null || value.isEmpty
@@ -220,18 +241,28 @@ class _HomeScreenState extends State<HomeScreen> {
                 await PdfService.generateAndPreview(context, billData);
               } else if (_currentTemplate == BillTemplate.transport) {
                 final transportData = TransportBillData(
+                  billNo: _billNoController.text,
                   billedTo: _billedToController.text,
                   billDate: _selectedDate,
                   items: _transportItems,
                 );
                 await PdfServiceV2.generateAndPreview(context, transportData);
-              } else {
+              } else if (_currentTemplate == BillTemplate.transportStatic) {
                 final transportData = TransportBillData(
+                  billNo: _billNoController.text,
                   billedTo: _billedToController.text,
                   billDate: _selectedDate,
                   items: _transportItems,
                 );
                 await PdfServiceV3.generateAndPreview(context, transportData);
+              } else {
+                final transportData = TransportBillData(
+                  billNo: _billNoController.text,
+                  billedTo: _billedToController.text,
+                  billDate: _selectedDate,
+                  items: _transportItems,
+                );
+                await PdfServiceV4.generateAndPreview(context, transportData);
               }
             }
           },

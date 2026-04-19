@@ -7,8 +7,8 @@ import 'package:printing/printing.dart';
 import '../models/transport_bill_data.dart';
 import '../utils/number_to_words.dart';
 
-class PdfServiceV3 {
-  static const int _fixedRowCount = 10; // Fixed number of rows to fill the page
+class PdfServiceV4 {
+  static const int _fixedRowCount = 18; 
 
   static Future<void> generateAndPreview(
     material.BuildContext context,
@@ -29,6 +29,9 @@ class PdfServiceV3 {
       mainFont = pw.Font.timesBold();
     }
 
+    final labelColor = PdfColors.grey700; // Grey as requested for labels
+    final underlineColor = PdfColors.grey400; // Light grey for underlines
+
     pdf.addPage(
       pw.Page(
         pageFormat: PdfPageFormat.a4,
@@ -47,30 +50,23 @@ class PdfServiceV3 {
                   child: pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
-                      pw.SizedBox(height: 231.7), // Moved 1cm higher from 260pt
+                      pw.SizedBox(height: 230), // Lower region to clear letterhead
                       
-                      // Billed To & Date Row
+                      // Bill No & Date Row
                       pw.Row(
                         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
-                          pw.Column(
-                            crossAxisAlignment: pw.CrossAxisAlignment.start,
-                            children: [
-                              pw.Text("To:", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
-                              pw.Text(billData.billedTo, style: pw.TextStyle(fontSize: 12)),
-                            ],
-                          ),
-                          pw.Column(
-                            crossAxisAlignment: pw.CrossAxisAlignment.end,
-                            children: [
-                              pw.Text("Date: ${billData.formattedDate}", style: pw.TextStyle(fontSize: 12)),
-                            ],
-                          ),
+                          _buildUnderlinedLabel("Bill No.", billData.billNo, labelColor, underlineColor),
+                          _buildUnderlinedLabel("Date", billData.formattedDate, labelColor, underlineColor),
                         ],
                       ),
 
-                      pw.SizedBox(height: 20),
+                      pw.SizedBox(height: 10),
+
+                      // To Section
+                      _buildUnderlinedLabel("To,", billData.billedTo, labelColor, underlineColor, isFullWidth: true),
+
+                      pw.SizedBox(height: 15),
 
                       // Title
                       pw.Center(
@@ -87,52 +83,56 @@ class PdfServiceV3 {
                       pw.SizedBox(height: 10),
 
                       // Table
-                      _buildStaticTable(billData, mainFont),
+                      _buildTable(billData, mainFont),
 
-                      pw.SizedBox(height: 20),
+                      pw.SizedBox(height: 10),
+                    ],
+                  ),
+                ),
 
-                      // Rupees in Words
-                      pw.Container(
-                        padding: const pw.EdgeInsets.all(8),
-                        decoration: pw.BoxDecoration(
-                          border: pw.Border.all(color: PdfColors.grey),
-                        ),
-                        child: pw.RichText(
-                          text: pw.TextSpan(
-                            children: [
-                              pw.TextSpan(
-                                text: "RUPEES IN WORDS: ",
-                                style: pw.TextStyle(
-                                  color: PdfColors.black,
-                                  fontWeight: pw.FontWeight.bold,
-                                ),
-                              ),
-                              pw.TextSpan(
-                                text: NumberToWords.convert(billData.totalAmount.toInt()),
-                                style: pw.TextStyle(
-                                  color: PdfColor.fromHex("#FF0000"), // Red
-                                  fontWeight: pw.FontWeight.bold,
-                                ),
-                              ),
-                            ],
+                // Rupees in Words - Forced visibility via Positioned
+                pw.Positioned(
+                  left: 40,
+                  right: 40,
+                  bottom: 110,
+                  child: pw.Container(
+                    padding: const pw.EdgeInsets.all(6),
+                    decoration: pw.BoxDecoration(
+                      border: pw.Border.all(color: PdfColors.grey),
+                    ),
+                    child: pw.RichText(
+                      text: pw.TextSpan(
+                        children: [
+                          pw.TextSpan(
+                            text: "RUPEES IN WORDS: ",
+                            style: pw.TextStyle(
+                              color: PdfColors.black,
+                              fontWeight: pw.FontWeight.bold,
+                              fontSize: 10,
+                            ),
                           ),
-                        ),
+                          pw.TextSpan(
+                            text: (NumberToWords.convert(billData.totalAmount.toInt()).toUpperCase() + " ONLY"),
+                            style: pw.TextStyle(
+                              color: PdfColor.fromHex("#FF0000"), // Red
+                              fontWeight: pw.FontWeight.bold,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
                       ),
+                    ),
+                  ),
+                ),
 
-                      pw.Spacer(),
-
-                      // Signature area
-                      pw.Align(
-                        alignment: pw.Alignment.bottomRight,
-                        child: pw.Column(
-                          crossAxisAlignment: pw.CrossAxisAlignment.center,
-                          children: [
-                            pw.SizedBox(height: 40),
-                            pw.Text("Proprietor Sign", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
-                          ],
-                        ),
-                      ),
-                      pw.SizedBox(height: 70), // Lowered from 85.5
+                // Signature area - Forced visibility via Positioned
+                pw.Positioned(
+                  right: 40,
+                  bottom: 15, // Further lowered from 25
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                    children: [
+                      pw.Text("Proprietor Sign", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 11)),
                     ],
                   ),
                 ),
@@ -148,24 +148,44 @@ class PdfServiceV3 {
     );
   }
 
-  static pw.Widget _buildStaticTable(TransportBillData billData, pw.Font font) {
+  static pw.Widget _buildUnderlinedLabel(String label, String value, PdfColor labelColor, PdfColor underlineColor, {bool isFullWidth = false}) {
+    return pw.Container(
+      width: isFullWidth ? double.infinity : null,
+      decoration: pw.BoxDecoration(
+        border: pw.Border(bottom: pw.BorderSide(color: underlineColor, width: 0.5)),
+      ),
+      child: pw.Row(
+        mainAxisSize: pw.MainAxisSize.min,
+        children: [
+          pw.Text(label + " ", style: pw.TextStyle(color: labelColor, fontWeight: pw.FontWeight.bold, fontSize: 11)),
+          pw.Expanded(
+            child: pw.Center(
+               child: pw.Text(value, style: pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static pw.Widget _buildTable(TransportBillData billData, pw.Font font) {
     const tableBorderColor = PdfColors.grey;
     final headerStyle = pw.TextStyle(
       color: PdfColors.black,
       fontWeight: pw.FontWeight.bold,
-      fontSize: 10,
+      fontSize: 9, // Smaller for T4
     );
-    final cellTextStyle = pw.TextStyle(fontSize: 10);
+    final cellTextStyle = pw.TextStyle(fontSize: 9); // Smaller for T4
 
     return pw.Table(
       border: pw.TableBorder.all(color: tableBorderColor),
       columnWidths: {
-        0: const pw.FixedColumnWidth(55), // Date
-        1: const pw.FixedColumnWidth(85), // Lorry No (Increased)
+        0: const pw.FixedColumnWidth(50), // Date
+        1: const pw.FixedColumnWidth(80), // Lorry No
         2: const pw.FixedColumnWidth(60), // Material
         3: const pw.FixedColumnWidth(55), // Challan
         4: const pw.FixedColumnWidth(35), // Trips
-        5: const pw.FixedColumnWidth(100), // Site
+        5: const pw.FixedColumnWidth(120), // Site
         6: const pw.FixedColumnWidth(50), // Rate
         7: const pw.FixedColumnWidth(60), // Amount
       },
@@ -201,9 +221,9 @@ class PdfServiceV3 {
               ],
             );
           } else {
-            // Empty rows
+            // Empty rows (Compact height = 15 instead of 25)
             return pw.TableRow(
-              children: List.generate(8, (_) => pw.SizedBox(height: 20)),
+              children: List.generate(8, (_) => pw.SizedBox(height: 15)),
             );
           }
         }),
@@ -214,10 +234,10 @@ class PdfServiceV3 {
             pw.SizedBox(),
             pw.SizedBox(),
             pw.SizedBox(),
-            _pCell("${billData.totalTrips} trips", pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10), align: pw.TextAlign.center),
+            _pCell("${billData.totalTrips} trips", pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9), align: pw.TextAlign.center),
             pw.SizedBox(),
-            _pCell("TOTAL", pw.TextStyle(color: PdfColors.red, fontWeight: pw.FontWeight.bold, fontSize: 10), align: pw.TextAlign.right),
-            _pCell(billData.totalAmount.toInt().toString(), pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10), align: pw.TextAlign.right),
+            _pCell("TOTAL", pw.TextStyle(color: PdfColors.red, fontWeight: pw.FontWeight.bold, fontSize: 9), align: pw.TextAlign.center),
+            _pCell(billData.totalAmount.toInt().toString(), pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9), align: pw.TextAlign.center),
           ],
         ),
       ],
@@ -226,7 +246,7 @@ class PdfServiceV3 {
 
   static pw.Widget _pCell(String text, pw.TextStyle style, {pw.TextAlign align = pw.TextAlign.left}) {
     return pw.Padding(
-      padding: const pw.EdgeInsets.all(5),
+      padding: const pw.EdgeInsets.all(3), // Reduced padding for compact
       child: pw.Text(text, style: style, textAlign: align),
     );
   }
