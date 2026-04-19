@@ -101,7 +101,7 @@ class PdfServiceV2 {
                               pw.TextSpan(
                                 text: "RUPEES IN WORDS: ",
                                 style: pw.TextStyle(
-                                  color: PdfColors.green,
+                                  color: PdfColors.black,
                                   fontWeight: pw.FontWeight.bold,
                                 ),
                               ),
@@ -157,21 +157,21 @@ class PdfServiceV2 {
   static pw.Widget _buildTable(TransportBillData billData, pw.Font font) {
     const tableBorderColor = PdfColors.grey;
     final headerStyle = pw.TextStyle(
-      color: PdfColors.green,
+      color: PdfColors.black,
       fontWeight: pw.FontWeight.bold,
-      fontSize: 12,
+      fontSize: 10,
     );
     final cellTextStyle = pw.TextStyle(fontSize: 10);
 
     return pw.Table(
       border: pw.TableBorder.all(color: tableBorderColor),
       columnWidths: {
-        0: const pw.FixedColumnWidth(60), // Date
-        1: const pw.FixedColumnWidth(80), // Lorry No
-        2: const pw.FixedColumnWidth(80), // Material
-        3: const pw.FixedColumnWidth(60), // Challan
-        4: const pw.FixedColumnWidth(40), // Trips
-        5: const pw.FixedColumnWidth(100), // Site
+        0: const pw.FixedColumnWidth(55), // Date
+        1: const pw.FixedColumnWidth(70), // Lorry No
+        2: const pw.FixedColumnWidth(65), // Material
+        3: const pw.FixedColumnWidth(55), // Challan
+        4: const pw.FixedColumnWidth(35), // Trips
+        5: const pw.FixedColumnWidth(110), // Site
         6: const pw.FixedColumnWidth(50), // Rate
         7: const pw.FixedColumnWidth(60), // Amount
       },
