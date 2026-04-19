@@ -102,10 +102,8 @@ class TransportBillTester(FPDF):
         self.ln(20)
         
     def add_signature(self):
-        # Move Y offset 25.5 points (0.9cm) higher
-        self.set_y(self.h - 145.5)
-        self.set_x(self.w - 200)
-        self.ln(40)
+        # Position signature relative to the content area
+        self.set_y(self.h - 130)
         self.set_x(self.w - 200)
         self.set_font("helvetica", "B", 12)
         self.cell(160, 15, "Proprietor Sign", align='C', ln=True)
@@ -120,8 +118,8 @@ class TransportBillTester(FPDF):
         self.set_left_margin(40)
         self.set_right_margin(40)
         
-        # Bill No (Left) & Date (Right) with Overlines/Underlines logic
-        self.set_text_color(0, 128, 0) # Green
+        # Labels color (Grey)
+        self.set_text_color(128, 128, 128) 
         self.set_font("helvetica", "B", 11)
         
         start_y = self.get_y()
@@ -130,7 +128,7 @@ class TransportBillTester(FPDF):
         self.cell(100, 20, f"  {bill_no}", border='B')
         
         self.set_x(self.w - 180)
-        self.set_text_color(0, 128, 0)
+        self.set_text_color(128, 128, 128)
         self.cell(40, 20, "Date ")
         self.set_text_color(0, 0, 0)
         self.cell(0, 20, f"  {date}", border='B', ln=True)
@@ -138,7 +136,7 @@ class TransportBillTester(FPDF):
         self.ln(10)
         
         # To Section
-        self.set_text_color(0, 128, 0)
+        self.set_text_color(128, 128, 128)
         self.cell(30, 20, "To,")
         self.set_text_color(0, 0, 0)
         self.cell(0, 20, f"  {billed_to}", border='B', ln=True)
