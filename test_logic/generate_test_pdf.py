@@ -107,6 +107,85 @@ class TransportBillTester(FPDF):
         self.cell(160, 15, "Proprietor Sign", align='C', ln=True)
 
 
+    def add_compact_layout(self, bill_no, billed_to, date):
+        self.add_page()
+        if os.path.exists(self.template_path):
+            self.image(self.template_path, x=0, y=0, w=self.w, h=self.h)
+        
+        self.set_y(230)
+        self.set_left_margin(40)
+        self.set_right_margin(40)
+        
+        # Bill No (Left) & Date (Right) with Overlines/Underlines logic
+        self.set_text_color(0, 128, 0) # Green
+        self.set_font("helvetica", "B", 11)
+        
+        start_y = self.get_y()
+        self.cell(50, 20, "Bill No.")
+        self.set_text_color(0, 0, 0)
+        self.cell(100, 20, f"  {bill_no}", border='B')
+        
+        self.set_x(self.w - 180)
+        self.set_text_color(0, 128, 0)
+        self.cell(40, 20, "Date ")
+        self.set_text_color(0, 0, 0)
+        self.cell(0, 20, f"  {date}", border='B', ln=True)
+        
+        self.ln(10)
+        
+        # To Section
+        self.set_text_color(0, 128, 0)
+        self.cell(30, 20, "To,")
+        self.set_text_color(0, 0, 0)
+        self.cell(0, 20, f"  {billed_to}", border='B', ln=True)
+        
+        # Second underline
+        self.cell(30, 15, "")
+        self.cell(0, 15, "", border='B', ln=True)
+        
+        self.ln(10)
+        self.set_text_color(255, 0, 0) # Red
+        self.set_font("helvetica", "B", 12)
+        self.cell(0, 20, "Only Transporting Bill Charges", align='C', ln=True)
+        self.set_text_color(0, 0, 0)
+        self.ln(5)
+
+    def draw_compact_table(self, items):
+        # Smaller font and padding for T4
+        cols = [50, 80, 60, 55, 35, 120, 50, 60]
+        headers = ["Date", "Lorry No.", "Material", "Challan", "Trips", "Site", "Rate", "Amount"]
+        
+        self.set_font("helvetica", "B", 9)
+        for i, h in enumerate(headers):
+            self.cell(cols[i], 20, h, border=1, align='C')
+        self.ln()
+        
+        self.set_font("helvetica", "", 9)
+        t_trips, t_amt = 0, 0
+        for i in range(18): # Fixed 18 compact rows
+            if i < len(items):
+                it = items[i]
+                t_trips += it['trips']
+                t_amt += it['trips'] * it['rate']
+                row = [it['date'], it['lorry'], it['material'], it['challan'], str(it['trips']), it['site'], str(it['rate']), str(it['trips']*it['rate'])]
+                for idx, val in enumerate(row):
+                    self.cell(cols[idx], 18, val, border=1, align='C')
+                self.ln()
+            else:
+                for w in cols: self.cell(w, 18, "", border=1)
+                self.ln()
+        
+        # Summary
+        self.set_font("helvetica", "B", 9)
+        self.cell(sum(cols[:4]), 20, "")
+        self.cell(cols[4], 20, f"{t_trips} trips", border=1, align='C')
+        self.cell(cols[5], 20, "")
+        self.set_text_color(255, 0, 0)
+        self.cell(cols[6], 20, "TOTAL", border=1, align='C')
+        self.set_text_color(0, 0, 0)
+        self.cell(cols[7], 20, str(t_amt), border=1, align='C')
+        self.ln(25)
+
 # Sample Execution
 if __name__ == "__main__":
     sample_data = [
@@ -120,7 +199,6 @@ if __name__ == "__main__":
     pdf2.draw_table(sample_data, is_static=False)
     pdf2.add_signature()
     pdf2.output("test_template_2_dynamic.pdf")
-    print("Generated: test_template_2_dynamic.pdf")
     
     # Generate Template 3 (Static)
     pdf3 = TransportBillTester("transport-bill-template.png")
@@ -128,4 +206,11 @@ if __name__ == "__main__":
     pdf3.draw_table(sample_data, is_static=True)
     pdf3.add_signature()
     pdf3.output("test_template_3_static.pdf")
-    print("Generated: test_template_3_static.pdf")
+    
+    # Generate Template 4 (Compact)
+    pdf4 = TransportBillTester("transport-bill-template.png")
+    pdf4.add_compact_layout("036", "NARSI INTERIOR INFRASTRUCTURE PVT. LTD.", "15/04/2026")
+    pdf4.draw_compact_table(sample_data)
+    pdf4.add_signature()
+    pdf4.output("test_template_4_compact.pdf")
+    print("Generated all test PDFs including Template 4")
