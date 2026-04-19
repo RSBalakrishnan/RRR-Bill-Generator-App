@@ -43,3 +43,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Generated Files
+*.pdf
+Screenshot 2026-04-19 at 5.05.27 PM.png
+

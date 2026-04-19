@@ -21,7 +21,7 @@ class PdfService {
     // Try to load Kingred Modern font, fallback to Times Bold
     pw.Font? kingredFont;
     try {
-      final fontData = await rootBundle.load("assets/fonts/KingredModern.ttf");
+      final fontData = await rootBundle.load("assets/fonts/kingred.otf");
       kingredFont = pw.Font.ttf(fontData);
     } catch (e) {
       // Fallback to standard serif font if custom font is missing

@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/bill_data.dart';
+import '../models/transport_bill_data.dart';
 import '../services/pdf_service.dart';
+import '../services/pdf_service_v2.dart';
 import '../widgets/billed_to_field.dart';
 import '../widgets/date_selector.dart';
 import '../widgets/service_item_card.dart';
+import '../widgets/transport_service_item_card.dart';
 import '../widgets/generate_bill_button.dart';
+
+enum BillTemplate { standard, transport }
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,20 +23,50 @@ class _HomeScreenState extends State<HomeScreen> {
   final _formKey = GlobalKey<FormState>();
   final _billedToController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
-  final List<ServiceItem> _services = [
+  BillTemplate _currentTemplate = BillTemplate.standard;
+
+  // Template 1 State
+  final List<ServiceItem> _standardServices = [
     ServiceItem(service: '', count: 1, amountPerLoad: 0),
+  ];
+
+  // Template 2 State
+  final List<TransportServiceItem> _transportItems = [
+    TransportServiceItem(
+      date: '',
+      lorryNo: '',
+      material: '',
+      challanNo: '',
+      trips: 1,
+      site: '',
+      rate: 0,
+    ),
   ];
 
   void _addService() {
     setState(() {
-      _services.add(ServiceItem(service: '', count: 1, amountPerLoad: 0));
+      if (_currentTemplate == BillTemplate.standard) {
+        _standardServices.add(ServiceItem(service: '', count: 1, amountPerLoad: 0));
+      } else {
+        _transportItems.add(TransportServiceItem(
+          date: '',
+          lorryNo: '',
+          material: '',
+          challanNo: '',
+          trips: 1,
+          site: '',
+          rate: 0,
+        ));
+      }
     });
   }
 
   void _removeService(int index) {
     setState(() {
-      if (_services.length > 1) {
-        _services.removeAt(index);
+      if (_currentTemplate == BillTemplate.standard) {
+        if (_standardServices.length > 1) _standardServices.removeAt(index);
+      } else {
+        if (_transportItems.length > 1) _transportItems.removeAt(index);
       }
     });
   }
@@ -58,6 +93,25 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Template Selector
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ChoiceChip(
+                    label: const Text("Standard Bill"),
+                    selected: _currentTemplate == BillTemplate.standard,
+                    onSelected: (val) => setState(() => _currentTemplate = BillTemplate.standard),
+                  ),
+                  const SizedBox(width: 12),
+                  ChoiceChip(
+                    label: const Text("Transport Bill"),
+                    selected: _currentTemplate == BillTemplate.transport,
+                    onSelected: (val) => setState(() => _currentTemplate = BillTemplate.transport),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              
               Text(
                 "Bill Details",
                 style: GoogleFonts.poppins(
@@ -67,28 +121,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               Divider(color: Colors.grey.shade300),
-              SizedBox(
-                height: 235,
-                child: Card(
-                  color: Colors.white,
+              
+              Card(
+                color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Row(
-                          children: [
-                            Text(
-                              "Details",
-                              style: GoogleFonts.poppins(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 15),
                       BilledToField(
                         controller: _billedToController,
                         validator: (value) => value == null || value.isEmpty
@@ -98,11 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 16),
                       DateSelector(
                         selectedDate: _selectedDate,
-                        onDateSelected: (date) {
-                          setState(() {
-                            _selectedDate = date;
-                          });
-                        },
+                        onDateSelected: (date) => setState(() => _selectedDate = date),
                       ),
                     ],
                   ),
@@ -111,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
               const SizedBox(height: 24),
               Text(
-                'Services',
+                _currentTemplate == BillTemplate.standard ? 'Services' : 'Transport Entries',
                 style: GoogleFonts.poppins(
                   color: Colors.black,
                   fontSize: 18,
@@ -119,23 +154,43 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               Divider(color: Colors.grey.shade300),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: _services.length,
-                itemBuilder: (context, index) {
-                  return ServiceItemCard(
-                    service: _services[index],
-                    index: index,
-                    onRemove: () => _removeService(index),
-                    onAdd: _addService,
-                    onNameChanged: (value) => _services[index].service = value,
-                    onCountChanged: (value) => _services[index].count = value,
-                    onAmountChanged: (value) =>
-                        _services[index].amountPerLoad = value,
-                  );
-                },
-              ),
+              
+              if (_currentTemplate == BillTemplate.standard)
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _standardServices.length,
+                  itemBuilder: (context, index) {
+                    return ServiceItemCard(
+                      service: _standardServices[index],
+                      index: index,
+                      onRemove: () => _removeService(index),
+                      onAdd: _addService,
+                      onNameChanged: (value) => _standardServices[index].service = value,
+                      onCountChanged: (value) => _standardServices[index].count = value,
+                      onAmountChanged: (value) => _standardServices[index].amountPerLoad = value,
+                    );
+                  },
+                )
+              else
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _transportItems.length,
+                  itemBuilder: (context, index) {
+                    return TransportServiceItemCard(
+                      item: _transportItems[index],
+                      index: index,
+                      onRemove: () => _removeService(index),
+                      onAdd: _addService,
+                      onChanged: (updatedItem) {
+                        setState(() {
+                          _transportItems[index] = updatedItem;
+                        });
+                      },
+                    );
+                  },
+                ),
               const SizedBox(height: 16),
             ],
           ),
@@ -146,13 +201,21 @@ class _HomeScreenState extends State<HomeScreen> {
         child: GenerateBillButton(
           onPressed: () async {
             if (_formKey.currentState!.validate()) {
-              final billData = BillData(
-                billedTo: _billedToController.text,
-                date: _selectedDate,
-                services: _services,
-              );
-
-              await PdfService.generateAndPreview(context, billData);
+              if (_currentTemplate == BillTemplate.standard) {
+                final billData = BillData(
+                  billedTo: _billedToController.text,
+                  date: _selectedDate,
+                  services: _standardServices,
+                );
+                await PdfService.generateAndPreview(context, billData);
+              } else {
+                final transportData = TransportBillData(
+                  billedTo: _billedToController.text,
+                  billDate: _selectedDate,
+                  items: _transportItems,
+                );
+                await PdfServiceV2.generateAndPreview(context, transportData);
+              }
             }
           },
         ),
@@ -160,3 +223,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
