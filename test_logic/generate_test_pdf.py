@@ -23,8 +23,8 @@ class TransportBillTester(FPDF):
         self.set_font("helvetica", "", 12)
         self.cell(0, 15, billed_to, ln=True)
         
-        # Date (Right aligned)
-        self.set_y(275)
+        # Date (Right aligned, kept relative to To section)
+        self.set_y(246.7)
         self.set_font("helvetica", "", 12)
         self.cell(0, 15, f"Date: {date}", align='R', ln=True)
         
