@@ -4,13 +4,14 @@ import '../models/bill_data.dart';
 import '../models/transport_bill_data.dart';
 import '../services/pdf_service.dart';
 import '../services/pdf_service_v2.dart';
+import '../services/pdf_service_v3.dart';
 import '../widgets/billed_to_field.dart';
 import '../widgets/date_selector.dart';
 import '../widgets/service_item_card.dart';
 import '../widgets/transport_service_item_card.dart';
 import '../widgets/generate_bill_button.dart';
 
-enum BillTemplate { standard, transport }
+enum BillTemplate { standard, transport, transportStatic }
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ServiceItem(service: '', count: 1, amountPerLoad: 0),
   ];
 
-  // Template 2 State
+  // Template 2 & 3 State (Shared)
   final List<TransportServiceItem> _transportItems = [
     TransportServiceItem(
       date: '',
@@ -94,21 +95,30 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Template Selector
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ChoiceChip(
-                    label: const Text("Standard Bill"),
-                    selected: _currentTemplate == BillTemplate.standard,
-                    onSelected: (val) => setState(() => _currentTemplate = BillTemplate.standard),
-                  ),
-                  const SizedBox(width: 12),
-                  ChoiceChip(
-                    label: const Text("Transport Bill"),
-                    selected: _currentTemplate == BillTemplate.transport,
-                    onSelected: (val) => setState(() => _currentTemplate = BillTemplate.transport),
-                  ),
-                ],
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ChoiceChip(
+                      label: const Text("Standard"),
+                      selected: _currentTemplate == BillTemplate.standard,
+                      onSelected: (val) => setState(() => _currentTemplate = BillTemplate.standard),
+                    ),
+                    const SizedBox(width: 8),
+                    ChoiceChip(
+                      label: const Text("Transport (Dynamic)"),
+                      selected: _currentTemplate == BillTemplate.transport,
+                      onSelected: (val) => setState(() => _currentTemplate = BillTemplate.transport),
+                    ),
+                    const SizedBox(width: 8),
+                    ChoiceChip(
+                      label: const Text("Transport (Static)"),
+                      selected: _currentTemplate == BillTemplate.transportStatic,
+                      onSelected: (val) => setState(() => _currentTemplate = BillTemplate.transportStatic),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 16),
               
@@ -208,18 +218,26 @@ class _HomeScreenState extends State<HomeScreen> {
                   services: _standardServices,
                 );
                 await PdfService.generateAndPreview(context, billData);
-              } else {
+              } else if (_currentTemplate == BillTemplate.transport) {
                 final transportData = TransportBillData(
                   billedTo: _billedToController.text,
                   billDate: _selectedDate,
                   items: _transportItems,
                 );
                 await PdfServiceV2.generateAndPreview(context, transportData);
+              } else {
+                final transportData = TransportBillData(
+                  billedTo: _billedToController.text,
+                  billDate: _selectedDate,
+                  items: _transportItems,
+                );
+                await PdfServiceV3.generateAndPreview(context, transportData);
               }
             }
           },
         ),
       ),
+
     );
   }
 }
