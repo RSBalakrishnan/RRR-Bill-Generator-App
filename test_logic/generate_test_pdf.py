@@ -98,7 +98,8 @@ class TransportBillTester(FPDF):
         self.set_text_color(0, 0, 0)
         
     def add_signature(self):
-        self.set_y(self.h - 120)
+        # Move Y offset 25.5 points (0.9cm) higher
+        self.set_y(self.h - 145.5)
         self.set_x(self.w - 200)
         self.ln(40)
         self.set_x(self.w - 200)

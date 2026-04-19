@@ -132,7 +132,7 @@ class PdfServiceV3 {
                           ],
                         ),
                       ),
-                      pw.SizedBox(height: 60),
+                      pw.SizedBox(height: 85.5),
                     ],
                   ),
                 ),
