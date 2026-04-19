@@ -88,7 +88,7 @@ class TransportBillTester(FPDF):
         self.cell(cols[5], 25, "", border=0) # Space
         self.set_text_color(128, 128, 128)
         self.cell(cols[6], 25, "TOTAL", border=1, align='C')
-        self.set_text_color(128, 128, 128) # Amount also grey
+        self.set_text_color(0, 0, 0) # Amount now black
         self.cell(cols[7], 25, str(total_amount), border=1, align='C')
         self.ln(25)
         self.draw_rupees_in_words(total_amount)
@@ -127,26 +127,25 @@ class TransportBillTester(FPDF):
         self.set_left_margin(40)
         self.set_right_margin(40)
         
-        # Labels color (Grey)
+        # Bill No (Label width 50, Total 180 as in Dart)
         self.set_text_color(128, 128, 128) 
         self.set_font("helvetica", "B", 11)
-        
-        start_y = self.get_y()
         self.cell(50, 20, "Bill No.")
         self.set_text_color(0, 0, 0)
-        self.cell(100, 20, f"  {bill_no}", border='B')
+        self.cell(130, 20, f"  {bill_no}", border='B')
         
-        self.set_x(self.w - 180)
+        # Date (Label width 40, Total 150 as in Dart)
+        self.set_x(self.w - 190) # Adjust position to fit 150pt width
         self.set_text_color(128, 128, 128)
-        self.cell(40, 20, "Date ")
+        self.cell(40, 20, "Date")
         self.set_text_color(0, 0, 0)
-        self.cell(0, 20, f"  {date}", border='B', ln=True)
+        self.cell(110, 20, f"  {date}", border='B', ln=True)
         
         self.ln(10)
         
-        # To Section
+        # To Section (Label width 50, Full width as in Dart)
         self.set_text_color(128, 128, 128)
-        self.cell(30, 20, "To,")
+        self.cell(50, 20, "To,")
         self.set_text_color(0, 0, 0)
         self.cell(0, 20, f"  {billed_to}", border='B', ln=True)
         
@@ -191,7 +190,7 @@ class TransportBillTester(FPDF):
         self.cell(cols[5], 20, "")
         self.set_text_color(128, 128, 128)
         self.cell(cols[6], 20, "TOTAL", border=1, align='C')
-        self.set_text_color(128, 128, 128) # Amount also grey
+        self.set_text_color(0, 0, 0) # Amount now black
         self.cell(cols[7], 20, str(t_amt), border=1, align='C')
         self.ln(20)
         self.draw_rupees_in_words(t_amt)

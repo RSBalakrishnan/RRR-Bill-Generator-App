@@ -20,14 +20,9 @@ class PdfServiceV4 {
     final Uint8List imageData = bytes.buffer.asUint8List();
     final pw.ImageProvider templateImage = pw.MemoryImage(imageData);
 
-    // Font loading
-    pw.Font? mainFont;
-    try {
-      final fontData = await rootBundle.load("assets/fonts/kingred.otf");
-      mainFont = pw.Font.ttf(fontData);
-    } catch (e) {
-      mainFont = pw.Font.timesBold();
-    }
+    // Use standard Helvetica fonts to match Python test script
+    final pw.Font mainFont = pw.Font.helvetica();
+    final pw.Font boldFont = pw.Font.helveticaBold();
 
     final labelColor = PdfColors.grey700; // Grey as requested for labels
     final underlineColor = PdfColors.grey400; // Light grey for underlines
@@ -56,15 +51,15 @@ class PdfServiceV4 {
                       pw.Row(
                         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                         children: [
-                          _buildUnderlinedLabel("Bill No.", billData.billNo, labelColor, underlineColor),
-                          _buildUnderlinedLabel("Date", billData.formattedDate, labelColor, underlineColor),
+                          _buildUnderlinedLabel("Bill No.", billData.billNo, labelColor, boldFont, 180, labelWidth: 50),
+                          _buildUnderlinedLabel("Date", billData.formattedDate, labelColor, boldFont, 150, labelWidth: 40),
                         ],
                       ),
 
                       pw.SizedBox(height: 10),
 
                       // To Section
-                      _buildUnderlinedLabel("To,", billData.billedTo, labelColor, underlineColor, isFullWidth: true),
+                      _buildUnderlinedLabel("To,", billData.billedTo, labelColor, boldFont, double.infinity, labelWidth: 50),
 
                       pw.SizedBox(height: 15),
 
@@ -73,9 +68,9 @@ class PdfServiceV4 {
                         child: pw.Text(
                           "Base Freight Charge",
                           style: pw.TextStyle(
-                            color: PdfColors.grey700, 
+                            font: boldFont,
+                            color: PdfColors.grey700,
                             fontSize: 12,
-                            fontWeight: pw.FontWeight.bold,
                           ),
                         ),
                       ),
@@ -83,7 +78,7 @@ class PdfServiceV4 {
                       pw.SizedBox(height: 10),
 
                       // Table
-                      _buildTable(billData, mainFont),
+                      _buildTable(billData, mainFont, boldFont),
 
                       pw.SizedBox(height: 10),
                     ],
@@ -106,16 +101,16 @@ class PdfServiceV4 {
                           pw.TextSpan(
                             text: "RUPEES IN WORDS: ",
                             style: pw.TextStyle(
+                              font: boldFont,
                               color: PdfColors.grey700,
-                              fontWeight: pw.FontWeight.bold,
                               fontSize: 10,
                             ),
                           ),
                           pw.TextSpan(
-                            text: (NumberToWords.convert(billData.totalAmount.toInt()).toUpperCase() + " ONLY"),
+                            text: (NumberToWords.convert(billData.totalAmount.toInt()).toUpperCase()),
                             style: pw.TextStyle(
-                              color: PdfColors.black, // Red -> Black
-                              fontWeight: pw.FontWeight.bold,
+                              font: boldFont,
+                              color: PdfColors.black,
                               fontSize: 10,
                             ),
                           ),
@@ -125,14 +120,14 @@ class PdfServiceV4 {
                   ),
                 ),
 
-                // Signature area - Forced visibility via Positioned
+                // Signature area - Moved up to avoid footer overlap
                 pw.Positioned(
                   right: 40,
-                  bottom: 5, // Extremely low position
+                  bottom: 50, // Moved up from 5
                   child: pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.center,
                     children: [
-                      pw.Text("Proprietor Sign", style: pw.TextStyle(color: PdfColors.grey700, fontWeight: pw.FontWeight.bold, fontSize: 11)),
+                      pw.Text("Proprietor Sign", style: pw.TextStyle(font: boldFont, color: PdfColors.grey700, fontSize: 11)),
                     ],
                   ),
                 ),
@@ -148,19 +143,23 @@ class PdfServiceV4 {
     );
   }
 
-  static pw.Widget _buildUnderlinedLabel(String label, String value, PdfColor labelColor, PdfColor underlineColor, {bool isFullWidth = false}) {
+  static pw.Widget _buildUnderlinedLabel(String label, String value, PdfColor labelColor, pw.Font font, double totalWidth, {double? labelWidth}) {
     return pw.Container(
-      width: isFullWidth ? double.infinity : null,
-      decoration: pw.BoxDecoration(
-        border: pw.Border(bottom: pw.BorderSide(color: underlineColor, width: 0.5)),
+      width: totalWidth,
+      decoration: const pw.BoxDecoration(
+        border: pw.Border(bottom: pw.BorderSide(color: PdfColors.grey400, width: 0.5)),
       ),
+      padding: const pw.EdgeInsets.only(bottom: 2),
       child: pw.Row(
-        mainAxisSize: pw.MainAxisSize.min,
         children: [
-          pw.Text(label + " ", style: pw.TextStyle(color: labelColor, fontWeight: pw.FontWeight.bold, fontSize: 11)),
+          pw.SizedBox(
+            width: labelWidth,
+            child: pw.Text(label, style: pw.TextStyle(font: font, color: labelColor, fontSize: 11)),
+          ),
           pw.Expanded(
-            child: pw.Center(
-               child: pw.Text(value, style: pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold)),
+            child: pw.Padding(
+              padding: const pw.EdgeInsets.symmetric(horizontal: 5),
+              child: pw.Text(value, style: pw.TextStyle(font: font, fontSize: 11)),
             ),
           ),
         ],
@@ -168,14 +167,15 @@ class PdfServiceV4 {
     );
   }
 
-  static pw.Widget _buildTable(TransportBillData billData, pw.Font font) {
+  static pw.Widget _buildTable(TransportBillData billData, pw.Font mainFont, pw.Font boldFont) {
     const tableBorderColor = PdfColors.grey;
     final headerStyle = pw.TextStyle(
+      font: boldFont,
       color: PdfColors.black,
-      fontWeight: pw.FontWeight.bold,
       fontSize: 9, // Smaller for T4
     );
     final cellTextStyle = pw.TextStyle(
+      font: mainFont,
       color: PdfColors.black,
       fontSize: 9,
     ); 
@@ -238,10 +238,10 @@ class PdfServiceV4 {
             pw.SizedBox(),
             pw.SizedBox(),
             pw.SizedBox(),
-            _pCell("${billData.totalTrips} trips", pw.TextStyle(color: PdfColors.grey700, fontWeight: pw.FontWeight.bold, fontSize: 9), align: pw.TextAlign.center),
+            _pCell("${billData.totalTrips} trips", pw.TextStyle(font: boldFont, color: PdfColors.grey700, fontSize: 9), align: pw.TextAlign.center),
             pw.SizedBox(),
-            _pCell("TOTAL", pw.TextStyle(color: PdfColors.grey700, fontWeight: pw.FontWeight.bold, fontSize: 9), align: pw.TextAlign.center),
-            _pCell(billData.totalAmount.toInt().toString(), pw.TextStyle(color: PdfColors.grey700, fontWeight: pw.FontWeight.bold, fontSize: 9), align: pw.TextAlign.center),
+            _pCell("TOTAL", pw.TextStyle(font: boldFont, color: PdfColors.grey700, fontSize: 9), align: pw.TextAlign.center),
+            _pCell(billData.totalAmount.toInt().toString(), pw.TextStyle(font: boldFont, color: PdfColors.black, fontSize: 9), align: pw.TextAlign.center),
           ],
         ),
       ],

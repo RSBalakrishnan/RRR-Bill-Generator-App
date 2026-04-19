@@ -18,14 +18,9 @@ class PdfServiceV2 {
     final Uint8List imageData = bytes.buffer.asUint8List();
     final pw.ImageProvider templateImage = pw.MemoryImage(imageData);
 
-    // Font loading
-    pw.Font? mainFont;
-    try {
-      final fontData = await rootBundle.load("assets/fonts/kingred.otf");
-      mainFont = pw.Font.ttf(fontData);
-    } catch (e) {
-      mainFont = pw.Font.timesBold();
-    }
+    // Use standard Helvetica fonts to match Python test script
+    final pw.Font mainFont = pw.Font.helvetica();
+    final pw.Font boldFont = pw.Font.helveticaBold();
 
     pdf.addPage(
       pw.Page(
@@ -55,14 +50,14 @@ class PdfServiceV2 {
                           pw.Column(
                             crossAxisAlignment: pw.CrossAxisAlignment.start,
                             children: [
-                              pw.Text("To:", style: pw.TextStyle(color: PdfColors.grey700, fontWeight: pw.FontWeight.bold, fontSize: 12)),
-                              pw.Text(billData.billedTo, style: pw.TextStyle(color: PdfColors.grey700, fontSize: 14)),
+                              pw.Text("To:", style: pw.TextStyle(font: boldFont, color: PdfColors.grey700, fontSize: 10)),
+                              pw.Text(billData.billedTo, style: pw.TextStyle(font: mainFont, color: PdfColors.grey700, fontSize: 12)),
                             ],
                           ),
                           pw.Column(
                             crossAxisAlignment: pw.CrossAxisAlignment.end,
                             children: [
-                              pw.Text("Date: ${billData.formattedDate}", style: pw.TextStyle(color: PdfColors.grey700, fontSize: 14)),
+                              pw.Text("Date: ${billData.formattedDate}", style: pw.TextStyle(font: mainFont, color: PdfColors.grey700, fontSize: 12)),
                             ],
                           ),
                         ],
@@ -75,9 +70,9 @@ class PdfServiceV2 {
                         child: pw.Text(
                           "Base Freight Charge",
                           style: pw.TextStyle(
-                            color: PdfColors.grey700, // Reduced from black
-                            fontSize: 16,
-                            fontWeight: pw.FontWeight.bold,
+                            font: boldFont,
+                            color: PdfColors.grey700,
+                            fontSize: 12,
                           ),
                         ),
                       ),
@@ -85,7 +80,7 @@ class PdfServiceV2 {
                       pw.SizedBox(height: 10),
 
                       // Table
-                      _buildTable(billData, mainFont),
+                      _buildTable(billData, mainFont, boldFont),
 
                       pw.SizedBox(height: 20),
 
@@ -101,15 +96,17 @@ class PdfServiceV2 {
                               pw.TextSpan(
                                 text: "RUPEES IN WORDS: ",
                                 style: pw.TextStyle(
+                                  font: boldFont,
                                   color: PdfColors.grey700,
-                                  fontWeight: pw.FontWeight.bold,
+                                  fontSize: 10,
                                 ),
                               ),
                               pw.TextSpan(
                                 text: NumberToWords.convert(billData.totalAmount.toInt()),
                                 style: pw.TextStyle(
-                                  color: PdfColors.black, // Red -> Black
-                                  fontWeight: pw.FontWeight.bold,
+                                  font: boldFont,
+                                  color: PdfColors.black,
+                                  fontSize: 10,
                                 ),
                               ),
                             ],
@@ -128,13 +125,13 @@ class PdfServiceV2 {
                             pw.Text(
                               "Rajamani Transport",
                               style: pw.TextStyle(
-                                color: PdfColors.black, // Red -> Black
-                                fontWeight: pw.FontWeight.bold,
+                                font: boldFont,
+                                color: PdfColors.black,
                                 fontSize: 14,
                               ),
                             ),
                              pw.SizedBox(height: 40),
-                            pw.Text("Proprietor Sign", style: pw.TextStyle(color: PdfColors.grey700, fontSize: 12, fontWeight: pw.FontWeight.bold)),
+                            pw.Text("Proprietor Sign", style: pw.TextStyle(font: boldFont, color: PdfColors.grey700, fontSize: 12)),
                           ],
                         ),
                       ),
@@ -154,14 +151,14 @@ class PdfServiceV2 {
     );
   }
 
-  static pw.Widget _buildTable(TransportBillData billData, pw.Font font) {
+  static pw.Widget _buildTable(TransportBillData billData, pw.Font mainFont, pw.Font boldFont) {
     const tableBorderColor = PdfColors.grey;
     final headerStyle = pw.TextStyle(
+      font: boldFont,
       color: PdfColors.black,
-      fontWeight: pw.FontWeight.bold,
       fontSize: 10,
     );
-    final cellTextStyle = pw.TextStyle(color: PdfColors.black, fontSize: 10);
+    final cellTextStyle = pw.TextStyle(font: mainFont, color: PdfColors.black, fontSize: 10);
 
     return pw.Table(
       border: pw.TableBorder.all(color: tableBorderColor),
@@ -210,10 +207,10 @@ class PdfServiceV2 {
             pw.SizedBox(),
             pw.SizedBox(),
             pw.SizedBox(),
-            _pCell("${billData.totalTrips} trips", pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10), align: pw.TextAlign.center),
+            _pCell("${billData.totalTrips} trips", pw.TextStyle(font: boldFont, fontSize: 10), align: pw.TextAlign.center),
             pw.SizedBox(),
-            _pCell("TOTAL", pw.TextStyle(color: PdfColors.grey700, fontWeight: pw.FontWeight.bold, fontSize: 10), align: pw.TextAlign.right),
-            _pCell(billData.totalAmount.toInt().toString(), pw.TextStyle(color: PdfColors.grey700, fontWeight: pw.FontWeight.bold, fontSize: 10), align: pw.TextAlign.right),
+            _pCell("TOTAL", pw.TextStyle(font: boldFont, color: PdfColors.grey700, fontSize: 10), align: pw.TextAlign.right),
+            _pCell(billData.totalAmount.toInt().toString(), pw.TextStyle(font: boldFont, color: PdfColors.black, fontSize: 10), align: pw.TextAlign.right),
           ],
         ),
       ],
