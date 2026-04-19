@@ -85,13 +85,16 @@ class TransportBillTester(FPDF):
         self.cell(cols[6], 25, "TOTAL", border=1, align='C')
         self.set_text_color(0, 0, 0)
         self.cell(cols[7], 25, str(total_amount), border=1, align='C')
-        self.ln(35)
-        
-        # Rupees in Words
-        self.ln(10)
+        self.ln(25)
+        self.draw_rupees_in_words(total_amount)
+
+    def draw_rupees_in_words(self, amount):
+        # Shared method to ensure it appears in all templates
+        self.ln(5)
         curr_y = self.get_y()
-        self.rect(40, curr_y, self.w - 80, 25)
-        self.set_y(curr_y + 5)
+        self.set_left_margin(40)
+        self.rect(40, curr_y, self.w - 80, 30)
+        self.set_y(curr_y + 8)
         self.set_x(50)
         self.set_font("helvetica", "B", 10)
         self.set_text_color(0, 0, 0)
@@ -99,8 +102,8 @@ class TransportBillTester(FPDF):
         self.set_text_color(255, 0, 0)
         self.cell(0, 15, "SAMPLE RUPEES IN WORDS ONLY", border=0)
         self.set_text_color(0, 0, 0)
-        self.ln(20)
-        
+        self.ln(25)
+
     def add_signature(self):
         # Position signature relative to the content area
         self.set_y(self.h - 130)
@@ -182,7 +185,8 @@ class TransportBillTester(FPDF):
         self.cell(cols[6], 20, "TOTAL", border=1, align='C')
         self.set_text_color(0, 0, 0)
         self.cell(cols[7], 20, str(t_amt), border=1, align='C')
-        self.ln(25)
+        self.ln(20)
+        self.draw_rupees_in_words(t_amt)
 
 # Sample Execution
 if __name__ == "__main__":
