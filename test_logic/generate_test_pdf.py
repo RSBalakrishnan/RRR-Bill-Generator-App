@@ -38,8 +38,8 @@ class TransportBillTester(FPDF):
         self.ln(10)
 
     def draw_table(self, items, is_static=False):
-        # Column widths matching Dart exactly
-        cols = [55, 70, 65, 55, 35, 110, 50, 60]
+        # Column widths matching Dart exactly (Updated Lorry No)
+        cols = [55, 85, 60, 55, 35, 100, 50, 60]
         headers = ["Date", "Lorry No.", "Material", "Challan", "Trips", "Site", "Rate", "Amount"]
         
         # Header
@@ -61,14 +61,14 @@ class TransportBillTester(FPDF):
                 total_trips += item['trips']
                 total_amount += item['trips'] * item['rate']
                 
-                self.cell(cols[0], 25, item['date'], border=1)
-                self.cell(cols[1], 25, item['lorry'], border=1)
-                self.cell(cols[2], 25, item['material'], border=1)
-                self.cell(cols[3], 25, item['challan'], border=1)
+                self.cell(cols[0], 25, item['date'], border=1, align='C')
+                self.cell(cols[1], 25, item['lorry'], border=1, align='C')
+                self.cell(cols[2], 25, item['material'], border=1, align='C')
+                self.cell(cols[3], 25, item['challan'], border=1, align='C')
                 self.cell(cols[4], 25, str(item['trips']), border=1, align='C')
-                self.cell(cols[5], 25, item['site'], border=1)
-                self.cell(cols[6], 25, str(item['rate']), border=1, align='R')
-                self.cell(cols[7], 25, str(item['trips'] * item['rate']), border=1, align='R')
+                self.cell(cols[5], 25, item['site'], border=1, align='C')
+                self.cell(cols[6], 25, str(item['rate']), border=1, align='C')
+                self.cell(cols[7], 25, str(item['trips'] * item['rate']), border=1, align='C')
                 self.ln()
             else:
                 # Empty rows for Template 3
@@ -82,9 +82,9 @@ class TransportBillTester(FPDF):
         self.cell(cols[4], 25, f"{total_trips} trips", border=1, align='C')
         self.cell(cols[5], 25, "", border=0) # Space
         self.set_text_color(255, 0, 0)
-        self.cell(cols[6], 25, "TOTAL", border=1, align='R')
+        self.cell(cols[6], 25, "TOTAL", border=1, align='C')
         self.set_text_color(0, 0, 0)
-        self.cell(cols[7], 25, str(total_amount), border=1, align='R')
+        self.cell(cols[7], 25, str(total_amount), border=1, align='C')
         self.ln(35)
         
         # Rupees in Words
