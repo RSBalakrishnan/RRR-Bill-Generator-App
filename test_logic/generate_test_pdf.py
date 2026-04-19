@@ -105,8 +105,8 @@ class TransportBillTester(FPDF):
         self.ln(25)
 
     def add_signature(self):
-        # Position signature relative to the content area
-        self.set_y(self.h - 130)
+        # Position signature lower (Further from content, closer to bottom)
+        self.set_y(self.h - 110) # Lowered from h - 130
         self.set_x(self.w - 200)
         self.set_font("helvetica", "B", 12)
         self.cell(160, 15, "Proprietor Sign", align='C', ln=True)
